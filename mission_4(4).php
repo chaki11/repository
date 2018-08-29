@@ -8,12 +8,29 @@ $password = 'パスワード';
 
 $pdo = new PDO($dsn,$user,$password);
 
+$sql= "CREATE TABLE mis_4"
+
+."("
+
+."id INT auto_increment primary key,"
+
+."name char(32) not null,"
+
+."comment TEXT not null,"
+
+."datetime DATETIME,"
+
+."pass char(32)"
+
+.");";
+
+$stmt = $pdo->query($sql);
 
 
 /* テーブル作成
 
 
-$sql= "CREATE TABLE m4"
+$sql= "CREATE TABLE mis_4"
 
 ."("
 
@@ -49,7 +66,7 @@ echo "<hr>";
 
 
 
-$sql ='SHOW CREATE TABLE m4';
+$sql ='SHOW CREATE TABLE mis_4';
 
 $result = $pdo -> query($sql);
 
@@ -67,19 +84,6 @@ echo "<hr>";
 
 
 
-/* 管理者用PW入力による全内容の削除 */
-
-
-
-if ($_POST["alldel"] == "***"){
-
-  $sql= "TRUNCATE TABLE m4";
-
-  $result = $pdo->query($sql);
-
-}
-
-
 
 /* 編集ボタンのクリック後、フォーム表示する内容の取得 */
 
@@ -89,17 +93,17 @@ if ((isset($_POST["edit"]) && $_POST["edit"] != "") &&
 
          (isset($_POST["editPass"]) && $_POST["editPass"] != "")){
 
-  $sql = "SELECT COUNT(*) FROM m4";
+  $sql = "SELECT COUNT(*) FROM mis_4";
 
   $uncertainNum = $_POST["edit"];
 
   $uncertainKey = $_POST["editPass"];
 
-  $sql = "SELECT id,name,comment,pass FROM m4 where id=$uncertainNum and pass='$uncertainKey'";
+  $sql = "SELECT id,name,comment,pass FROM mis_4 where id=$uncertainNum and pass='$uncertainKey'";
 
   $results = $pdo->query($sql);
 
-  foreach ((array)$results as $row){
+  foreach ($results->fetchAll() as $row){
 
     $editNum = $row['id'];
 
@@ -135,27 +139,28 @@ if ((isset($_POST["name"]) && $_POST["name"] != "") &&
 
      $pass = $_POST["password"];
 
-     $sql = "update m4 set name='$name',comment='$comment',pass='$pass' where id=$id";
+     $sql = "update mis_4 set name='$name',comment='$comment',pass='$pass' where id=$id";
 
      $result = $pdo->query($sql);
 
   }else{
 
-     $sql = 'SELECT * FROM m4';
+     $sql = 'SELECT * FROM mis_4 ';
 
-     $id = 1;
+     $id += 1; 
+     
 
      $gyos = $pdo -> query($sql);
 
-     foreach ((array)$gyos as $gyo){
+     foreach ($gyos->fetchAll() as $gyo){
 
-       $id += 1; 
-
+     
+$id = 1;
      }
 
-     $sql = $pdo -> prepare("INSERT INTO m4 (id,name,comment,datetime,pass) VALUES (:id,:name,:comment,:datetime,:pass)");
+     $sql = $pdo -> prepare("INSERT INTO mis_4 (name,comment,datetime,pass) VALUES (:name,:comment,:datetime,:pass)");
 
-     $sql -> bindParam(':id',$id,PDO::PARAM_INT);
+    
 
      $sql -> bindParam(':name',$name,PDO::PARAM_STR);
 
@@ -193,7 +198,7 @@ if ((isset($_POST["delete"]) && $_POST["delete"] != "") &&
 
   $delPass = $_POST["delPass"];
 
-  $sql = "update m4 set name='---削除されました。---',comment='',datetime='',pass='' where id=$delnum and pass='$delPass'";
+  $sql = "update mis_4 set name='---削除されました。---',comment='',datetime='',pass='' where id=$delnum and pass='$delPass'";
 
   $result = $pdo->query($sql);
 
@@ -305,11 +310,12 @@ if ((isset($_POST["delete"]) && $_POST["delete"] != "") &&
 
     <?php 
 
-  	$sql = 'SELECT * FROM m4 ORDER BY id DESC';
+  	$sql = 'SELECT * FROM mis_4 ORDER BY id ASC';
+	
 
   	$results = $pdo -> query($sql);
 
-  	foreach ((array)$results as $row){
+  	foreach ($results->fetchAll() as $row){
 
     	echo $row['id'].'  ';
 
@@ -325,13 +331,7 @@ if ((isset($_POST["delete"]) && $_POST["delete"] != "") &&
 
     <br>
 
-    <form action ="mission_4(4).php" method = "post">
-
-        <input type="text" name = "alldel" value="管理者用PW">
-
-        <input type="submit" value="全削除">
-
-    </form>
+    
 
 </body>
 
